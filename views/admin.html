@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; }
-        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
-        th, td { border: 1px solid black; padding: 10px; text-align: center; }
-        button { cursor: pointer; padding: 5px 10px; margin: 5px; }
-    </style>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h2>Admin Panel - User Management</h2>
@@ -83,19 +79,18 @@
     try {
         const response = await fetch('/check-admin', {
             method: 'GET',
-            credentials: 'include' // Include cookies for session-based auth
+            credentials: 'include'
         });
 
         if (!response.ok) {
             throw new Error('Access denied');
         }
 
-        // If the user is an admin, fetch and display the users
         fetchUsers();
     } catch (error) {
         console.error('Admin access error:', error);
         alert('You do not have permission to access this page.');
-        window.location.href = '/'; // Redirect to the home page
+        window.location.href = '/'; 
     }
 }
 

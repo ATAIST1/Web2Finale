@@ -13,12 +13,11 @@ const axios = require('axios')
 const app = express();
 const PORT = 3000;
 
-// Middleware
 app.use(session({
-    secret: '123', // Replace with a strong secret key
+    secret: '123',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { secure: false } 
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,26 +25,27 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 
-// OpenWeatherAPI configuration
 const OPENWEATHER_API_KEY = 'afe3029ed49903aa0b41559b63731738';
 const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const OPENWEATHER_AIR_POLLUTION_URL = 'http://api.openweathermap.org/data/2.5/air_pollution';
 
-// ipstack API configuration for geolocation
+
 const IPSTACK_API_KEY = '00d8db8ff88c4de233d87ad3d38d145f';
 const IPSTACK_BASE_URL = 'https://api.ipstack.com/';
 
-// NewsAPI configuration for news headlines
 const NEWSAPI_API_KEY = '3ec6966909b74ab1a7340859c992fd83';
 const NEWSAPI_BASE_URL = 'https://newsapi.org/v2/top-headlines';
 
-// MongoDB Connection
+
+const RESTCOUNTRIES_BASE_URL = 'https://restcountries.com/v3.1/alpha';
+
+
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.log('❌ MongoDB Error:', err));
 
-// Schemas and Models
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -63,7 +63,6 @@ const BlogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', BlogSchema);
 
-// Routes
 app.post('/blogs', async (req, res) => {
     try {
         const newBlog = new Blog(req.body);
@@ -184,7 +183,6 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        // Store user info in the session
         req.session.user = {
             id: user._id,
             email: user.email,
@@ -278,15 +276,13 @@ app.delete('/admin/delete/:id', checkAdmin, async (req, res) => {
     }
 });
 app.post('/logout', (req, res) => {
-    // Destroy the session
     req.session.destroy((err) => {
         if (err) {
             console.error('Error destroying session:', err);
             return res.status(500).json({ message: 'Error logging out' });
         }
 
-        // Clear the session cookie
-        res.clearCookie('connect.sid'); // 'connect.sid' is the default name for the session cookie
+        res.clearCookie('connect.sid'); 
         res.status(200).json({ message: 'Logged out successfully' });
     });
 });
@@ -300,7 +296,6 @@ app.post('/api/weather', async (req, res) => {
     const { city } = req.body;
 
     try {
-        // Fetch weather data from OpenWeatherAPI
         const weatherResponse = await axios.get(OPENWEATHER_BASE_URL, {
             params: {
                 q: city,
@@ -312,12 +307,23 @@ app.post('/api/weather', async (req, res) => {
         const weatherData = weatherResponse.data;
         const coordinates = weatherData.coord;
 
-        // Fetch geolocation data using ipstack API
+        const airQualityResponse = await axios.get(OPENWEATHER_AIR_POLLUTION_URL, {
+            params: {
+                lat: coordinates.lat,
+                lon: coordinates.lon,
+                appid: OPENWEATHER_API_KEY,
+            },
+        });
+
+        const airQualityData = airQualityResponse.data;
+
+        const countryCode = weatherData.sys.country;
+        const countryFlagResponse = await axios.get(`${RESTCOUNTRIES_BASE_URL}/${countryCode}`);
+        const countryFlagData = countryFlagResponse.data[0];
+
         const geoResponse = await axios.get(`${IPSTACK_BASE_URL}check?access_key=${IPSTACK_API_KEY}`);
-        console.log(geoResponse);
         const geoData = geoResponse.data;
 
-        // Fetch news headlines related to the city using NewsAPI
         const newsResponse = await axios.get(NEWSAPI_BASE_URL, {
             params: {
                 q: city,
@@ -338,6 +344,8 @@ app.post('/api/weather', async (req, res) => {
                 wind_speed: weatherData.wind.speed,
                 country: weatherData.sys.country,
                 rain_volume: weatherData.rain ? weatherData.rain['3h'] : 'No rain',
+                air_quality: airQualityData.list[0].main.aqi,
+                country_flag: countryFlagData.flags.png,
             },
             geolocation: {
                 city: geoData.city,

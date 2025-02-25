@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Final Project</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Welcome to the Final Project</h1>
@@ -24,12 +24,12 @@
         async function logout() {
             const response = await fetch('/logout', {
                 method: 'POST',
-                credentials: 'include' // Include cookies for session-based auth
+                credentials: 'include'
             });
 
             if (response.ok) {
                 alert('Logged out successfully');
-                window.location.href = '/'; // Redirect to the home page
+                window.location.href = '/'; 
             } else {
                 alert('Error logging out');
             }

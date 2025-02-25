@@ -4,22 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Manager</title>
-    <link rel="stylesheet" href="/styles.css">
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h1>📜 Blog Manager</h1>
 
-        <!-- Form for Adding/Editing Blogs -->
         <form id="blogForm">
-            <input type="hidden" id="blogId">  <!-- Hidden field for updating -->
+            <input type="hidden" id="blogId"> 
             <input type="text" id="title" placeholder="Title" required>
             <textarea id="content" placeholder="Content" required></textarea>
             <input type="text" id="author" placeholder="Author" required>
             <button type="submit">Save Blog</button>
         </form>
 
-        <!-- Blog List -->
         <h2>📌 All Blogs</h2>
         <div id="blogsContainer"></div>
     </div>

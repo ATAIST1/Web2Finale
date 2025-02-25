@@ -11,6 +11,8 @@
             width: 100%;
         }
     </style>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <form id="weatherForm">
@@ -41,17 +43,19 @@
     });
 
     function displayWeather(weather) {
-        const weatherInfo = document.getElementById('weatherInfo');
-        weatherInfo.innerHTML = `
-            <h2>Weather in ${weather.city}, ${weather.country}</h2>
-            <p>Temperature: ${weather.temperature}°C</p>
-            <p>Feels Like: ${weather.feels_like}°C</p>
-            <p>Condition: ${weather.description}</p>
-            <p>Humidity: ${weather.humidity}%</p>
-            <p>Wind Speed: ${weather.wind_speed} m/s</p>
-            <p>Rain Volume: ${weather.rain_volume}</p>
-        `;
-    }
+    const weatherInfo = document.getElementById('weatherInfo');
+    weatherInfo.innerHTML = 
+        `<h2>Weather in ${weather.city}, ${weather.country}</h2>
+        <img src="${weather.country_flag}" alt="${weather.country} Flag" style="width: 50px; height: auto;">
+        <p>Temperature: ${weather.temperature}°C</p>
+        <p>Feels Like: ${weather.feels_like}°C</p>
+        <p>Condition: ${weather.description}</p>
+        <p>Humidity: ${weather.humidity}%</p>
+        <p>Wind Speed: ${weather.wind_speed} m/s</p>
+        <p>Rain Volume: ${weather.rain_volume}</p>
+        <p>Air Quality Index: ${weather.air_quality}</p>`
+    ;
+}
 
     function displayGeolocation(geo) {
         const geoInfo = document.getElementById('geoInfo');
