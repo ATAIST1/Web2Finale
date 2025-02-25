@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>QR Code Generator</h1>
+        <input type="text" id="qrInput" placeholder="Enter URL">
+        <button onclick="generateQRCode()">Generate QR Code</button>
+        <div id="qrResult"></div>
+    </div>
+
+    <script>
+        async function generateQRCode() {
+            const input = document.getElementById('qrInput').value;
+            if (!input) {
+                alert("Please enter a valid URL.");
+                return;
+            }
+
+            const response = await fetch('/generate-qrcode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ link: input })
+            });
+
+            const data = await response.json();
+            if (data.qrPath) {
+                document.getElementById('qrResult').innerHTML = `<img src="${data.qrPath}" alt="QR Code">`;
+            } else {
+                alert("Failed to generate QR Code.");
+            }
+        }
+    </script>
+</body>
+</html>

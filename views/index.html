@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Project</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>Welcome to the Final Project</h1>
+    <nav>
+        <a href="/projects/qrcode">QR Code</a>
+        <a href="/projects/bmi">BMI Calculator</a>
+        <a href="/projects/weather">Weather API</a>
+        <a href="/projects/blogs">CRUD API</a>
+        <a href="/projects/nodemailer">Nodemailer</a>
+        <a href="/admin">Admin Panel</a>
+        <a href="/register">Register</a>
+        <a href="/login">Login</a>
+        <button onclick="logout()">Logout</button>
+    </nav>
+
+    <script>
+        async function logout() {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                credentials: 'include' // Include cookies for session-based auth
+            });
+
+            if (response.ok) {
+                alert('Logged out successfully');
+                window.location.href = '/'; // Redirect to the home page
+            } else {
+                alert('Error logging out');
+            }
+        }
+    </script>
+</body>
+</html>

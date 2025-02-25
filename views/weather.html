@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather API with Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <form id="weatherForm">
+        <input type="text" id="city" placeholder="Enter City" required />
+        <button type="submit">Get Weather</button>
+    </form>
+
+    <div id="weatherInfo"></div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+    document.getElementById('weatherForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const city = document.getElementById('city').value;
+        const response = await fetch('/api/weather', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ city })
+        });
+        const data = await response.json();
+        if (data.weather) {
+            displayWeather(data.weather);
+            displayGeolocation(data.geolocation);
+            displayNews(data.news);
+            displayMap(data.weather.coordinates);
+        }
+    });
+
+    function displayWeather(weather) {
+        const weatherInfo = document.getElementById('weatherInfo');
+        weatherInfo.innerHTML = `
+            <h2>Weather in ${weather.city}, ${weather.country}</h2>
+            <p>Temperature: ${weather.temperature}°C</p>
+            <p>Feels Like: ${weather.feels_like}°C</p>
+            <p>Condition: ${weather.description}</p>
+            <p>Humidity: ${weather.humidity}%</p>
+            <p>Wind Speed: ${weather.wind_speed} m/s</p>
+            <p>Rain Volume: ${weather.rain_volume}</p>
+        `;
+    }
+
+    function displayGeolocation(geo) {
+        const geoInfo = document.getElementById('geoInfo');
+        geoInfo.innerHTML = `
+            <h3>Location Info:</h3>
+            <p>City: ${geo.city}</p>
+            <p>Country: ${geo.country}</p>
+            <p>Region: ${geo.region}</p>
+        `;
+    }
+
+    function displayNews(news) {
+        const newsInfo = document.getElementById('newsInfo');
+        newsInfo.innerHTML = '<h3>Latest News:</h3>';
+        news.forEach(article => {
+            newsInfo.innerHTML += `
+                <p><strong>${article.title}</strong></p>
+                <p>${article.description}</p>
+                <a href="${article.url}" target="_blank">Read more</a>
+                <hr>
+            `;
+        });
+    }
+
+    function displayMap(coordinates) {
+        const map = L.map('map').setView([coordinates.lat, coordinates.lon], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        L.marker([coordinates.lat, coordinates.lon])
+            .addTo(map)
+            .bindPopup(`Location: ${coordinates.lat}, ${coordinates.lon}`)
+            .openPopup();
+    }
+</script>
+
+<div id="geoInfo"></div>
+<div id="newsInfo"></div>
+
+</body>
+</html>

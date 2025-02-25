@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Email</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        form { margin: 50px auto; width: 300px; }
+        input, textarea, button { width: 100%; margin: 10px 0; padding: 10px; }
+        button { background: green; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Send an Email</h1>
+    <form action="/send-email" method="POST">
+        <input type="email" name="receiverEmail" placeholder="Receiver Email" required>
+        <textarea name="message" placeholder="Your message..." required></textarea>
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>

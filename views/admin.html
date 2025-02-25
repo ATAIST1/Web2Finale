@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+        button { cursor: pointer; padding: 5px 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Admin Panel - User Management</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="userTable"></tbody>
+    </table>
+    <script>
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/admin/users');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+                const users = await response.json();
+                const table = document.getElementById('userTable');
+                table.innerHTML = users.map(user => `
+                    <tr>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>
+                            ${user.role === 'user' ? `<button onclick="promote('${user._id}')">Promote to Admin</button>` : ''}
+                            <button onclick="deleteUser('${user._id}')">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                alert('Failed to fetch users. Check the console for details.');
+            }
+        }
+
+        async function promote(id) {
+            try {
+                const response = await fetch(`/admin/promote/${id}`, { method: 'PUT' });
+                if (!response.ok) {
+                    throw new Error('Failed to promote user');
+                }
+                alert('User promoted successfully');
+                fetchUsers();
+            } catch (error) {
+                console.error('Error promoting user:', error);
+                alert('Failed to promote user. Check the console for details.');
+            }
+        }
+
+        async function deleteUser(id) {
+            try {
+                const response = await fetch(`/admin/delete/${id}`, { method: 'DELETE' });
+                if (!response.ok) {
+                    throw new Error('Failed to delete user');
+                }
+                alert('User deleted successfully');
+                fetchUsers();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Failed to delete user. Check the console for details.');
+            }
+        }
+
+        fetchUsers();
+        async function checkAdminAccess() {
+    try {
+        const response = await fetch('/check-admin', {
+            method: 'GET',
+            credentials: 'include' // Include cookies for session-based auth
+        });
+
+        if (!response.ok) {
+            throw new Error('Access denied');
+        }
+
+        // If the user is an admin, fetch and display the users
+        fetchUsers();
+    } catch (error) {
+        console.error('Admin access error:', error);
+        alert('You do not have permission to access this page.');
+        window.location.href = '/'; // Redirect to the home page
+    }
+}
+
+checkAdminAccess();
+    </script>
+</body>
+</html>
